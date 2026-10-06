@@ -1,78 +1,180 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#2563eb">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#2563eb"
+    >
+
+    <meta
+        name="description"
+        content="DOMPETKUU - Aplikasi pengelolaan keuangan pribadi"
+    >
+
     <title>DOMPETKUU</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
 </head>
 
+
 <body>
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
 <header class="topbar">
 
     <div>
-        <h1>Dompett - Qhaliqa</h1>
-        <p>Kelola keuanganmu dengan cerdas</p>
+
+        <h1>DOMPETKUU - Qhaliqa</h1>
+
+        <p>
+            Kelola keuanganmu dengan cerdas
+        </p>
+
     </div>
 
-    <button id="themeToggle" class="icon-btn">☾</button>
+
+    <button
+        type="button"
+        id="themeToggle"
+        class="icon-btn"
+        aria-label="Ganti tema"
+    >
+        ☾
+    </button>
 
 </header>
 
 
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
 <main class="container">
 
-    <!-- SALDO -->
+
+    <!-- =================================================
+         SALDO
+    ================================================== -->
 
     <section class="balance-card">
 
         <div>
-            <span>Saldo Saat Ini</span>
-            <h2 id="saldo">Rp0</h2>
+
+            <span>
+                Saldo Saat Ini
+            </span>
+
+            <h2 id="saldo">
+                Rp0
+            </h2>
+
         </div>
 
-        <div class="wallet-icon">💳</div>
+
+        <div
+            class="wallet-icon"
+            aria-hidden="true"
+        >
+            💳
+        </div>
 
     </section>
 
 
-    <!-- STATISTIK -->
+
+    <!-- =================================================
+         STATISTIK
+    ================================================== -->
 
     <section class="stats-grid">
 
+
         <div class="stat-card income">
-            <span>Total Pemasukan</span>
-            <strong id="totalIncome">Rp0</strong>
+
+            <span>
+                Total Pemasukan
+            </span>
+
+            <strong id="totalIncome">
+                Rp0
+            </strong>
+
         </div>
+
 
         <div class="stat-card expense">
-            <span>Total Pengeluaran</span>
-            <strong id="totalExpense">Rp0</strong>
+
+            <span>
+                Total Pengeluaran
+            </span>
+
+            <strong id="totalExpense">
+                Rp0
+            </strong>
+
         </div>
 
-        <div class="stat-card">
-            <span>Total Transaksi</span>
-            <strong id="transactionCount">0</strong>
-        </div>
 
         <div class="stat-card">
-            <span>Rasio Pengeluaran</span>
-            <strong id="expenseRatio">0%</strong>
+
+            <span>
+                Total Transaksi
+            </span>
+
+            <strong id="transactionCount">
+                0
+            </strong>
+
         </div>
+
+
+        <div class="stat-card">
+
+            <span>
+                Rasio Pengeluaran
+            </span>
+
+            <strong id="expenseRatio">
+                0%
+            </strong>
+
+        </div>
+
 
     </section>
 
 
-    <!-- STATUS KEUANGAN -->
+
+    <!-- =================================================
+         STATUS KEUANGAN
+    ================================================== -->
 
     <section class="card">
 
+
         <div class="indicator-header">
 
+
             <div>
+
                 <span class="section-label">
                     STATUS KEUANGAN
                 </span>
@@ -80,20 +182,32 @@
                 <h2 id="financialStatus">
                     Belum Ada Data
                 </h2>
+
             </div>
 
-            <div id="statusIcon" class="status-icon">
+
+            <div
+                id="statusIcon"
+                class="status-icon"
+                aria-hidden="true"
+            >
                 —
             </div>
 
+
         </div>
+
 
 
         <div class="progress-container">
 
-            <div id="progressBar" class="progress-bar"></div>
+            <div
+                id="progressBar"
+                class="progress-bar"
+            ></div>
 
         </div>
+
 
 
         <p
@@ -105,20 +219,38 @@
         </p>
 
 
+
         <div class="status-scale">
-            <span>Hemat</span>
-            <span>Normal</span>
-            <span>Boros</span>
+
+            <span>
+                Hemat
+            </span>
+
+            <span>
+                Normal
+            </span>
+
+            <span>
+                Boros
+            </span>
+
         </div>
+
 
     </section>
 
 
-    <!-- ANALISIS -->
+
+    <!-- =================================================
+         ANALISIS
+    ================================================== -->
 
     <section class="card">
 
-        <h3>Analisis Keuangan</h3>
+        <h3>
+            Analisis Keuangan
+        </h3>
+
 
         <div id="analysisContent">
 
@@ -131,18 +263,29 @@
     </section>
 
 
-    <!-- FORM TRANSAKSI -->
+
+    <!-- =================================================
+         FORM TRANSAKSI
+    ================================================== -->
 
     <section class="card">
+
 
         <span class="section-label">
             TRANSAKSI
         </span>
 
-        <h2>Tambah Transaksi</h2>
 
+        <h2>
+            Tambah Transaksi
+        </h2>
+
+
+
+        <!-- PILIHAN JENIS TRANSAKSI -->
 
         <div class="transaction-type">
+
 
             <button
                 type="button"
@@ -152,6 +295,7 @@
                 Uang Masuk
             </button>
 
+
             <button
                 type="button"
                 class="type-btn"
@@ -160,189 +304,306 @@
                 Uang Keluar
             </button>
 
+
         </div>
 
 
-        <form id="transactionForm">
+
+        <!-- FORM -->
+
+        <form
+            id="transactionForm"
+            autocomplete="off"
+        >
+
+
+            <!-- JENIS TRANSAKSI -->
 
             <input
                 type="hidden"
                 id="transactionType"
+                name="transactionType"
                 value="income"
             >
 
 
+
+            <!-- NOMINAL + TANGGAL -->
+
             <div class="form-grid">
 
+
+                <!-- NOMINAL -->
+
                 <div class="form-group">
+
 
                     <label for="amount">
                         Nominal
                     </label>
 
+
                     <div class="input-money">
 
-                        <span>Rp</span>
+
+                        <span aria-hidden="true">
+                            Rp
+                        </span>
+
 
                         <input
                             type="number"
                             id="amount"
+                            name="amount"
                             min="1"
+                            step="1"
+                            inputmode="numeric"
+                            pattern="[0-9]*"
                             placeholder="Contoh: 50000"
+                            autocomplete="off"
                             required
                         >
 
+
                     </div>
+
 
                 </div>
 
 
+
+                <!-- TANGGAL -->
+
                 <div class="form-group">
+
 
                     <label for="date">
                         Tanggal
                     </label>
 
+
                     <input
                         type="date"
                         id="date"
+                        name="date"
                         required
                     >
 
+
                 </div>
+
 
             </div>
 
 
-            <!-- FIELD PENGELUARAN -->
+
+            <!-- =================================================
+                 FIELD PENGELUARAN
+            ================================================== -->
 
             <div
                 id="expenseFields"
                 class="hidden"
             >
 
+
+                <!-- KATEGORI -->
+
                 <div class="form-group">
+
 
                     <label for="category">
                         Kategori Pembelian
                     </label>
 
-                    <select id="category">
+
+                    <select
+                        id="category"
+                        name="category"
+                    >
+
 
                         <option value="Kebutuhan">
                             Kebutuhan
                         </option>
 
+
                         <option value="Lainnya">
                             Lainnya
                         </option>
 
+
                     </select>
+
 
                 </div>
 
+
+
+                <!-- ALASAN LAINNYA -->
 
                 <div
                     id="reasonGroup"
                     class="form-group hidden"
                 >
 
+
                     <label for="reason">
                         Alasan Pembelian
                     </label>
 
+
                     <input
                         type="text"
                         id="reason"
+                        name="reason"
                         placeholder="Masukkan alasan"
+                        autocomplete="off"
                     >
 
+
                 </div>
+
 
             </div>
 
 
-            <!-- KETERANGAN -->
+
+            <!-- =================================================
+                 KETERANGAN
+            ================================================== -->
 
             <div class="form-group">
+
 
                 <label for="description">
                     Keterangan
                 </label>
 
+
                 <textarea
                     id="description"
+                    name="description"
                     rows="3"
                     placeholder="Contoh: Gaji, uang saku, membeli buku..."
+                    autocomplete="off"
                     required
                 ></textarea>
 
+
             </div>
 
+
+
+            <!-- =================================================
+                 SIMPAN
+            ================================================== -->
 
             <button
                 type="submit"
                 class="submit-btn"
+                id="saveTransaction"
             >
                 Simpan Transaksi
             </button>
 
+
         </form>
+
 
     </section>
 
 
-    <!-- RIWAYAT -->
+
+    <!-- =================================================
+         RIWAYAT TRANSAKSI
+    ================================================== -->
 
     <section class="card">
 
+
         <div class="history-header">
 
+
             <div>
+
                 <span class="section-label">
                     RIWAYAT
                 </span>
 
-                <h2>Transaksi</h2>
+                <h2>
+                    Transaksi
+                </h2>
+
             </div>
 
+
             <button
+                type="button"
                 id="clearTransactions"
                 class="danger-btn"
             >
                 Hapus Semua
             </button>
 
+
         </div>
+
 
 
         <div id="transactionList">
 
+
             <div class="empty-state">
 
-                <div>📊</div>
 
-                <h3>Belum ada transaksi</h3>
+                <div aria-hidden="true">
+                    📊
+                </div>
+
+
+                <h3>
+                    Belum ada transaksi
+                </h3>
+
 
                 <p>
                     Tambahkan transaksi pertama.
                 </p>
 
+
             </div>
+
 
         </div>
 
+
     </section>
+
 
 </main>
 
 
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
 <footer>
-    E-Money © 2026
+
+    DOMPETKUU © 2026
+
 </footer>
 
 
-<script src="javascript.js"></script>
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script src="./javascript.js"></script>
+
 
 </body>
+
 </html>
