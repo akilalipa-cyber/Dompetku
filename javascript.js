@@ -1045,6 +1045,110 @@ function renderTransactions() {
                                 )}
                             </span>
 
+            function renderTransactions() {
+
+    if (
+        transactions.length === 0
+    ) {
+
+        transactionList.innerHTML = `
+
+            <div class="empty-state">
+
+                <div>📊</div>
+
+                <h3>
+                    Belum ada transaksi
+                </h3>
+
+                <p>
+                    Tambahkan transaksi pertama.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    transactionList.innerHTML =
+        transactions.map(
+            function(transaction) {
+
+                const isIncome =
+                    transaction.type ===
+                    "income";
+
+
+                const sign =
+                    isIncome
+                        ? "+"
+                        : "-";
+
+
+                const typeText =
+                    isIncome
+                        ? "Uang Masuk"
+                        : "Uang Keluar";
+
+
+                let extra =
+                    "";
+
+
+                if (!isIncome) {
+
+                    extra = `
+
+                        <small>
+                            Kategori:
+                            ${escapeHTML(
+                                transaction.category
+                            )}
+                        </small>
+
+                        ${
+                            transaction.reason
+                                ? `
+                                    <small>
+                                        Alasan:
+                                        ${escapeHTML(
+                                            transaction.reason
+                                        )}
+                                    </small>
+                                  `
+                                : ""
+                        }
+
+                    `;
+
+                }
+
+
+                return `
+
+                    <div class="transaction-item
+                        ${isIncome
+                            ? "income"
+                            : "expense"}">
+
+                        <div class="transaction-info">
+
+                            <strong>
+                                ${escapeHTML(
+                                    transaction.description
+                                )}
+                            </strong>
+
+                            <span>
+                                ${formatDate(
+                                    transaction.date
+                                )}
+                            </span>
+
                             <small>
                                 ${typeText}
                             </small>
@@ -1066,4 +1170,246 @@ function renderTransactions() {
                                 type="button"
                                 class="delete-btn"
                                 data-id="${transaction.id}"
-       
+                            >
+                                Hapus
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+        ).join("");
+
+
+    /* ---------------------------------------------
+       EVENT HAPUS
+    --------------------------------------------- */
+
+    const deleteButtons =
+        transactionList.querySelectorAll(
+            ".delete-btn"
+        );
+
+
+    deleteButtons.forEach(
+        function(button) {
+
+            button.addEventListener(
+                "click",
+                function() {
+
+                    const id =
+                        this.dataset.id;
+
+
+                    const confirmed =
+                        confirm(
+                            "Yakin ingin menghapus transaksi ini?"
+                        );
+
+
+                    if (!confirmed) {
+                        return;
+                    }
+
+
+                    transactions =
+                        transactions.filter(
+                            function(transaction) {
+
+                                return String(
+                                    transaction.id
+                                ) !== String(id);
+
+                            }
+                        );
+
+
+                    saveTransactions();
+
+                    updateDashboard();
+
+                    renderTransactions();
+
+                }
+            );
+
+        }
+    );
+
+}
+/* =====================================================
+   FORMAT TANGGAL
+===================================================== */
+
+function formatDate(date) {
+
+    if (!date) {
+        return "-";
+    }
+
+
+    const parts =
+        date.split("-");
+
+
+    if (
+        parts.length !== 3
+    ) {
+
+        return date;
+
+    }
+
+
+    return (
+        `${parts[2]}/` +
+        `${parts[1]}/` +
+        `${parts[0]}`
+    );
+
+}
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHTML(value) {
+
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+
+/* =====================================================
+   HAPUS SEMUA
+===================================================== */
+
+clearTransactions.addEventListener(
+    "click",
+    function() {
+
+        if (
+            transactions.length === 0
+        ) {
+
+            alert(
+                "Belum ada transaksi."
+            );
+
+            return;
+
+        }
+
+
+        const confirmed =
+            confirm(
+                "Yakin ingin menghapus semua transaksi?"
+            );
+
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        transactions = [];
+
+
+        saveTransactions();
+
+        updateDashboard();
+
+        renderTransactions();
+
+    }
+);
+/* =====================================================
+   DARK MODE
+===================================================== */
+
+themeToggle.addEventListener(
+    "click",
+    function() {
+
+        document.body.classList.toggle(
+            "dark-mode"
+        );
+
+
+        const enabled =
+            document.body.classList.contains(
+                "dark-mode"
+            );
+
+
+        localStorage.setItem(
+            "dompetkuu_darkmode",
+            enabled
+                ? "true"
+                : "false"
+        );
+
+
+        themeToggle.textContent =
+            enabled
+                ? "☀"
+                : "☾";
+
+    }
+);
+
+
+/* =====================================================
+   LOAD DARK MODE
+===================================================== */
+
+function loadDarkMode() {
+
+    const saved =
+        localStorage.getItem(
+            "dompetkuu_darkmode"
+        );
+
+
+    if (
+        saved === "true"
+    ) {
+
+        document.body.classList.add(
+            "dark-mode"
+        );
+
+        themeToggle.textContent =
+            "☀";
+
+    }
+
+}
+
+
+/* =====================================================
+   START APPLICATION
+===================================================== */
+
+loadTransactions();
+
+setDefaultDate();
+
+loadDarkMode();
+
+updateDashboard();
+
+renderTransactions();
+
+
+console.log(
+    "DOMPETKUU berhasil dijalankan."
+);
