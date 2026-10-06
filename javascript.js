@@ -1,18 +1,20 @@
 /* =====================================================
    DOMPETKUU - JAVASCRIPT
-   Versi perbaikan
 ===================================================== */
+
+"use strict";
 
 
 /* =====================================================
-   ELEMENT HTML
+   ELEMENT
 ===================================================== */
 
 const form = document.getElementById("transactionForm");
 
 const amountInput = document.getElementById("amount");
 const dateInput = document.getElementById("date");
-const descriptionInput = document.getElementById("description");
+const descriptionInput =
+    document.getElementById("description");
 
 const transactionTypeInput =
     document.getElementById("transactionType");
@@ -68,33 +70,45 @@ const clearTransactions =
 const themeToggle =
     document.getElementById("themeToggle");
 
+const typeButtons =
+    document.querySelectorAll(".type-btn");
+
 
 /* =====================================================
-   DATABASE LOCAL STORAGE
+   DATABASE
 ===================================================== */
 
+const STORAGE_KEY =
+    "dompetkuu_transactions";
+
 let transactions = [];
+
+
+/* =====================================================
+   LOAD DATA
+===================================================== */
 
 function loadTransactions() {
 
     try {
 
-        const saved =
-            localStorage.getItem("emoney_transactions");
+        const data =
+            localStorage.getItem(STORAGE_KEY);
 
-        if (saved) {
+        if (!data) {
 
-            const parsed = JSON.parse(saved);
+            transactions = [];
 
-            if (Array.isArray(parsed)) {
+            return;
 
-                transactions = parsed;
+        }
 
-            } else {
+        const parsed =
+            JSON.parse(data);
 
-                transactions = [];
+        if (Array.isArray(parsed)) {
 
-            }
+            transactions = parsed;
 
         } else {
 
@@ -105,7 +119,7 @@ function loadTransactions() {
     } catch (error) {
 
         console.error(
-            "Gagal membaca data:",
+            "Gagal memuat transaksi:",
             error
         );
 
@@ -116,12 +130,16 @@ function loadTransactions() {
 }
 
 
+/* =====================================================
+   SAVE DATA
+===================================================== */
+
 function saveTransactions() {
 
     try {
 
         localStorage.setItem(
-            "emoney_transactions",
+            STORAGE_KEY,
             JSON.stringify(transactions)
         );
 
@@ -130,12 +148,12 @@ function saveTransactions() {
     } catch (error) {
 
         console.error(
-            "Gagal menyimpan data:",
+            "Gagal menyimpan transaksi:",
             error
         );
 
         alert(
-            "Data tidak dapat disimpan di perangkat ini."
+            "Transaksi gagal disimpan."
         );
 
         return false;
@@ -149,25 +167,29 @@ function saveTransactions() {
    FORMAT RUPIAH
 ===================================================== */
 
-function formatRupiah(number) {
+function formatRupiah(value) {
 
-    number = Number(number) || 0;
+    const number =
+        Number(value) || 0;
 
-    return "Rp" +
-        new Intl.NumberFormat(
-            "id-ID"
-        ).format(number);
+    return (
+        "Rp" +
+        new Intl.NumberFormat("id-ID")
+            .format(number)
+    );
 
 }
 
 
 /* =====================================================
-   TANGGAL DEFAULT
+   DEFAULT DATE
 ===================================================== */
 
 function setDefaultDate() {
 
-    if (!dateInput) return;
+    if (!dateInput) {
+        return;
+    }
 
     const today =
         new Date();
@@ -192,21 +214,15 @@ function setDefaultDate() {
 
 
 /* =====================================================
-   PILIHAN UANG MASUK / UANG KELUAR
+   PILIH JENIS TRANSAKSI
 ===================================================== */
 
-const typeButtons =
-    document.querySelectorAll(
-        ".type-btn"
-    );
-
-
 typeButtons.forEach(
-    button => {
+    function(button) {
 
         button.addEventListener(
             "click",
-            function () {
+            function() {
 
                 const type =
                     this.dataset.type;
@@ -214,8 +230,9 @@ typeButtons.forEach(
                 transactionTypeInput.value =
                     type;
 
+
                 typeButtons.forEach(
-                    btn => {
+                    function(btn) {
 
                         btn.classList.remove(
                             "active"
@@ -223,6 +240,7 @@ typeButtons.forEach(
 
                     }
                 );
+
 
                 this.classList.add(
                     "active"
@@ -245,7 +263,11 @@ typeButtons.forEach(
                         "hidden"
                     );
 
-                    reasonInput.value = "";
+                    reasonInput.required =
+                        false;
+
+                    reasonInput.value =
+                        "";
 
                 }
 
@@ -257,281 +279,28 @@ typeButtons.forEach(
 
 
 /* =====================================================
-   KATEGORI PENGELUARAN
+   KATEGORI
 ===================================================== */
 
-if (categoryInput) {
-
-    categoryInput.addEventListener(
-        "change",
-        function () {
-
-            if (
-                transactionTypeInput.value ===
-                "expense" &&
-                this.value === "Lainnya"
-            ) {
-
-                reasonGroup.classList.remove(
-                    "hidden"
-                );
-
-                reasonInput.required = true;
-
-            } else {
-
-                reasonGroup.classList.add(
-                    "hidden"
-                );
-
-                reasonInput.required = false;
-
-                reasonInput.value = "";
-
-            }
-
-        }
-    );
-
-}
-
-
-/* =====================================================
-   SIMPAN TRANSAKSI
-===================================================== */
-
-if (form) {
-
-    form.addEventListener(
-        "submit",
-        function (event) {
-
-            event.preventDefault();
-
-
-            /* -----------------------------
-               AMBIL NOMINAL
-            ----------------------------- */
-
-            const rawAmount =
-                amountInput.value.trim();
-
-
-            if (rawAmount === "") {
-
-                alert(
-                    "Silakan masukkan nominal."
-                );
-
-                amountInput.focus();
-
-                return;
-
-            }
-
-
-            const amount =
-                Number(rawAmount);
-
-
-            if (
-                !Number.isFinite(amount) ||
-                amount <= 0
-            ) {
-
-                alert(
-                    "Nominal harus lebih dari Rp0."
-                );
-
-                amountInput.focus();
-
-                return;
-
-            }
-
-
-            /* -----------------------------
-               AMBIL DATA LAINNYA
-            ----------------------------- */
-
-            const type =
-                transactionTypeInput.value;
-
-            const date =
-                dateInput.value;
-
-            const description =
-                descriptionInput.value.trim();
-
-
-            if (!date) {
-
-                alert(
-                    "Silakan pilih tanggal."
-                );
-
-                dateInput.focus();
-
-                return;
-
-            }
-
-
-            if (!description) {
-
-                alert(
-                    "Silakan isi keterangan."
-                );
-
-                descriptionInput.focus();
-
-                return;
-
-            }
-
-
-            /* -----------------------------
-               DATA PENGELUARAN
-            ----------------------------- */
-
-            let category = "";
-
-            let reason = "";
-
-
-            if (type === "expense") {
-
-                category =
-                    categoryInput.value;
-
-
-                if (category === "Lainnya") {
-
-                    reason =
-                        reasonInput.value.trim();
-
-
-                    if (!reason) {
-
-                        alert(
-                            "Alasan pembelian wajib diisi."
-                        );
-
-                        reasonInput.focus();
-
-                        return;
-
-                    }
-
-                }
-
-            }
-
-
-            /* -----------------------------
-               BUAT TRANSAKSI
-            ----------------------------- */
-
-            const transaction = {
-
-                id:
-                    Date.now().toString() +
-                    Math.random()
-                        .toString(36)
-                        .substring(2),
-
-                type: type,
-
-                amount: amount,
-
-                date: date,
-
-                description:
-                    description,
-
-                category:
-                    category,
-
-                reason:
-                    reason
-
-            };
-
-
-            /* -----------------------------
-               TAMBAHKAN DATA
-            ----------------------------- */
-
-            transactions.unshift(
-                transaction
-            );
-
-
-            /* -----------------------------
-               SIMPAN
-            ----------------------------- */
-
-            const saved =
-                saveTransactions();
-
-
-            if (!saved) {
-
-                transactions.shift();
-
-                return;
-
-            }
-
-
-            /* -----------------------------
-               PERBARUI TAMPILAN
-            ----------------------------- */
-
-            updateDashboard();
-
-            renderTransactions();
-
-
-            /* -----------------------------
-               RESET FORM
-            ----------------------------- */
-
-            form.reset();
-
-            transactionTypeInput.value =
-                "income";
-
-
-            typeButtons.forEach(
-                btn => {
-
-                    btn.classList.remove(
-                        "active"
-                    );
-
-                }
-            );
-
-
-            const incomeButton =
-                document.querySelector(
-                    '.type-btn[data-type="income"]'
-                );
-
-
-            if (incomeButton) {
-
-                incomeButton.classList.add(
-                    "active"
-                );
-
-            }
-
-
-            expenseFields.classList.add(
+categoryInput.addEventListener(
+    "change",
+    function() {
+
+        if (
+            transactionTypeInput.value ===
+            "expense" &&
+            categoryInput.value ===
+            "Lainnya"
+        ) {
+
+            reasonGroup.classList.remove(
                 "hidden"
             );
+
+            reasonInput.required =
+                true;
+
+        } else {
 
             reasonGroup.classList.add(
                 "hidden"
@@ -540,37 +309,302 @@ if (form) {
             reasonInput.required =
                 false;
 
-
-            setDefaultDate();
-
-
-            /* -----------------------------
-               PESAN BERHASIL
-            ----------------------------- */
-
-            alert(
-                "Transaksi berhasil disimpan!"
-            );
+            reasonInput.value =
+                "";
 
         }
-    );
 
-}
+    }
+);
 
 
 /* =====================================================
-   HITUNG DASHBOARD
+   SIMPAN TRANSAKSI
+===================================================== */
+
+form.addEventListener(
+    "submit",
+    function(event) {
+
+        event.preventDefault();
+
+
+        /* ---------------------------------------------
+           NOMINAL
+        --------------------------------------------- */
+
+        const rawAmount =
+            amountInput.value.trim();
+
+
+        if (rawAmount === "") {
+
+            alert(
+                "Nominal belum diisi."
+            );
+
+            amountInput.focus();
+
+            return;
+
+        }
+
+
+        const amount =
+            Number(rawAmount);
+
+
+        if (
+            !Number.isFinite(amount) ||
+            amount <= 0
+        ) {
+
+            alert(
+                "Nominal harus lebih besar dari Rp0."
+            );
+
+            amountInput.focus();
+
+            return;
+
+        }
+
+
+        /* ---------------------------------------------
+           DATA DASAR
+        --------------------------------------------- */
+
+        const type =
+            transactionTypeInput.value;
+
+        const date =
+            dateInput.value;
+
+        const description =
+            descriptionInput.value.trim();
+
+
+        if (!date) {
+
+            alert(
+                "Tanggal belum dipilih."
+            );
+
+            dateInput.focus();
+
+            return;
+
+        }
+
+
+        if (!description) {
+
+            alert(
+                "Keterangan belum diisi."
+            );
+
+            descriptionInput.focus();
+
+            return;
+
+        }
+
+
+        /* ---------------------------------------------
+           DATA PENGELUARAN
+        --------------------------------------------- */
+
+        let category = "";
+        let reason = "";
+
+
+        if (type === "expense") {
+
+            category =
+                categoryInput.value;
+
+
+            if (!category) {
+
+                alert(
+                    "Pilih kategori pengeluaran."
+                );
+
+                categoryInput.focus();
+
+                return;
+
+            }
+
+
+            if (category === "Lainnya") {
+
+                reason =
+                    reasonInput.value.trim();
+
+
+                if (!reason) {
+
+                    alert(
+                        "Alasan pembelian wajib diisi."
+                    );
+
+                    reasonInput.focus();
+
+                    return;
+
+                }
+
+            }
+
+        }
+
+
+        /* ---------------------------------------------
+           BUAT TRANSAKSI
+        --------------------------------------------- */
+
+        const transaction = {
+
+            id:
+                Date.now() +
+                "-" +
+                Math.random()
+                    .toString(36)
+                    .substring(2, 9),
+
+            type: type,
+
+            amount: amount,
+
+            date: date,
+
+            description:
+                description,
+
+            category:
+                category,
+
+            reason:
+                reason,
+
+            createdAt:
+                new Date().toISOString()
+
+        };
+
+
+        /* ---------------------------------------------
+           MASUKKAN KE ARRAY
+        --------------------------------------------- */
+
+        transactions.unshift(
+            transaction
+        );
+
+
+        /* ---------------------------------------------
+           SIMPAN KE LOCAL STORAGE
+        --------------------------------------------- */
+
+        const saved =
+            saveTransactions();
+
+
+        if (!saved) {
+
+            transactions.shift();
+
+            return;
+
+        }
+
+
+        /* ---------------------------------------------
+           UPDATE
+        --------------------------------------------- */
+
+        updateDashboard();
+
+        renderTransactions();
+
+
+        /* ---------------------------------------------
+           RESET FORM
+        --------------------------------------------- */
+
+        form.reset();
+
+
+        transactionTypeInput.value =
+            "income";
+
+
+        typeButtons.forEach(
+            function(btn) {
+
+                btn.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+
+        const incomeButton =
+            document.querySelector(
+                '[data-type="income"]'
+            );
+
+
+        if (incomeButton) {
+
+            incomeButton.classList.add(
+                "active"
+            );
+
+        }
+
+
+        expenseFields.classList.add(
+            "hidden"
+        );
+
+
+        reasonGroup.classList.add(
+            "hidden"
+        );
+
+
+        reasonInput.required =
+            false;
+
+
+        setDefaultDate();
+
+
+        alert(
+            type === "income"
+                ? "Uang masuk berhasil disimpan!"
+                : "Uang keluar berhasil disimpan!"
+        );
+
+    }
+);
+
+
+/* =====================================================
+   UPDATE DASHBOARD
 ===================================================== */
 
 function updateDashboard() {
 
     let totalIncome = 0;
-
     let totalExpense = 0;
 
 
     transactions.forEach(
-        transaction => {
+        function(transaction) {
 
             const amount =
                 Number(transaction.amount) || 0;
@@ -583,7 +617,10 @@ function updateDashboard() {
 
                 totalIncome += amount;
 
-            } else if (
+            }
+
+
+            if (
                 transaction.type ===
                 "expense"
             ) {
@@ -601,9 +638,9 @@ function updateDashboard() {
         totalExpense;
 
 
-    /* -----------------------------
-       DASHBOARD
-    ----------------------------- */
+    /* ---------------------------------------------
+       TAMPILKAN
+    --------------------------------------------- */
 
     saldoElement.textContent =
         formatRupiah(saldo);
@@ -621,9 +658,9 @@ function updateDashboard() {
         transactions.length;
 
 
-    /* -----------------------------
-       RASIO PENGELUARAN
-    ----------------------------- */
+    /* ---------------------------------------------
+       RASIO
+    --------------------------------------------- */
 
     let ratio = 0;
 
@@ -658,22 +695,17 @@ function updateDashboard() {
 
 function updateFinancialStatus(
     ratio,
-    totalIncome,
-    totalExpense,
+    income,
+    expense,
     saldo
 ) {
 
-    let status =
-        "Belum Ada Data";
-
-    let icon =
-        "—";
-
-    let description =
-        "Tambahkan transaksi untuk melihat analisis keuangan.";
+    let status;
+    let icon;
+    let description;
 
 
-    if (totalIncome <= 0) {
+    if (transactions.length === 0) {
 
         status =
             "Belum Ada Data";
@@ -682,7 +714,20 @@ function updateFinancialStatus(
             "—";
 
         description =
-            "Tambahkan pemasukan untuk mulai melihat kondisi keuangan.";
+            "Tambahkan transaksi untuk melihat analisis keuangan.";
+
+    }
+
+    else if (income <= 0) {
+
+        status =
+            "Belum Ada Pemasukan";
+
+        icon =
+            "—";
+
+        description =
+            "Tambahkan pemasukan sebelum melakukan analisis keuangan.";
 
     }
 
@@ -695,7 +740,7 @@ function updateFinancialStatus(
             "★";
 
         description =
-            "Pengeluaranmu sangat terkendali. Pertahankan kebiasaan mengelola uang dengan baik.";
+            "Pengeluaran sangat terkendali. Pertahankan pengelolaan keuanganmu.";
 
     }
 
@@ -708,7 +753,7 @@ function updateFinancialStatus(
             "✓";
 
         description =
-            "Kondisi keuangan cukup sehat. Tetap kendalikan pengeluaran.";
+            "Pengeluaran cukup terkendali. Kondisi keuangan tergolong baik.";
 
     }
 
@@ -721,7 +766,7 @@ function updateFinancialStatus(
             "●";
 
         description =
-            "Pengeluaran masih dalam batas normal, tetapi sebaiknya mulai memperhatikan prioritas.";
+            "Pengeluaran masih dalam batas normal. Tetap prioritaskan kebutuhan.";
 
     }
 
@@ -734,7 +779,7 @@ function updateFinancialStatus(
             "!";
 
         description =
-            "Pengeluaran cukup tinggi dibandingkan pemasukan. Kurangi pengeluaran yang tidak penting.";
+            "Pengeluaran cukup tinggi dibandingkan pemasukan. Kurangi pengeluaran yang kurang penting.";
 
     }
 
@@ -742,42 +787,32 @@ function updateFinancialStatus(
     financialStatus.textContent =
         status;
 
-
     statusIcon.textContent =
         icon;
-
 
     statusDescription.textContent =
         description;
 
 
-    /* -----------------------------
-       PROGRESS BAR
-    ----------------------------- */
+    /* ---------------------------------------------
+       PROGRESS
+    --------------------------------------------- */
 
-    let progress =
-        ratio;
-
-
-    if (progress > 100) {
-
-        progress = 100;
-
-    }
+    const progress =
+        Math.min(
+            Math.max(ratio, 0),
+            100
+        );
 
 
     progressBar.style.width =
         `${progress}%`;
 
 
-    /* -----------------------------
-       ANALISIS
-    ----------------------------- */
-
     generateAnalysis(
         ratio,
-        totalIncome,
-        totalExpense,
+        income,
+        expense,
         saldo
     );
 
@@ -785,14 +820,14 @@ function updateFinancialStatus(
 
 
 /* =====================================================
-   ANALISIS KEUANGAN
+   ANALISIS
 ===================================================== */
 
 function generateAnalysis(
     ratio,
     income,
     expense,
-    balance
+    saldo
 ) {
 
     if (transactions.length === 0) {
@@ -808,16 +843,16 @@ function generateAnalysis(
     }
 
 
-    let advice = "";
+    let message = "";
 
 
     if (income <= 0) {
 
-        advice = `
+        message = `
             <p>
-                Belum terdapat pemasukan.
-                Tambahkan pemasukan agar analisis
-                keuangan dapat dilakukan.
+                Saat ini belum ada pemasukan.
+                Tambahkan pemasukan untuk mengetahui
+                kondisi keuangan secara lengkap.
             </p>
         `;
 
@@ -825,10 +860,9 @@ function generateAnalysis(
 
     else if (ratio <= 30) {
 
-        advice = `
+        message = `
             <p>
-                Kondisi keuangan sangat baik.
-                Pengeluaran hanya
+                Sangat baik. Pengeluaranmu hanya
                 ${ratio.toFixed(1)}%
                 dari total pemasukan.
             </p>
@@ -838,10 +872,10 @@ function generateAnalysis(
 
     else if (ratio <= 50) {
 
-        advice = `
+        message = `
             <p>
-                Kamu cukup hemat.
-                Pengeluaran berada di angka
+                Kondisi cukup hemat.
+                Pengeluaran berada pada
                 ${ratio.toFixed(1)}%
                 dari pemasukan.
             </p>
@@ -851,12 +885,11 @@ function generateAnalysis(
 
     else if (ratio <= 75) {
 
-        advice = `
+        message = `
             <p>
                 Pengeluaran masih normal,
-                tetapi sebaiknya mulai
-                mengurangi pembelian yang
-                kurang penting.
+                tetapi sebaiknya mulai memperhatikan
+                pembelian yang tidak terlalu penting.
             </p>
         `;
 
@@ -864,13 +897,12 @@ function generateAnalysis(
 
     else {
 
-        advice = `
+        message = `
             <p>
-                Pengeluaran cukup tinggi,
-                yaitu
+                Pengeluaran mencapai
                 ${ratio.toFixed(1)}%
                 dari pemasukan.
-                Coba prioritaskan kebutuhan utama.
+                Prioritaskan kebutuhan utama.
             </p>
         `;
 
@@ -879,22 +911,22 @@ function generateAnalysis(
 
     analysisContent.innerHTML = `
 
-        ${advice}
+        ${message}
 
         <div class="analysis-summary">
 
             <p>
                 <strong>Saldo:</strong>
-                ${formatRupiah(balance)}
+                ${formatRupiah(saldo)}
             </p>
 
             <p>
-                <strong>Pemasukan:</strong>
+                <strong>Total pemasukan:</strong>
                 ${formatRupiah(income)}
             </p>
 
             <p>
-                <strong>Pengeluaran:</strong>
+                <strong>Total pengeluaran:</strong>
                 ${formatRupiah(expense)}
             </p>
 
@@ -906,15 +938,10 @@ function generateAnalysis(
 
 
 /* =====================================================
-   RIWAYAT TRANSAKSI
+   RENDER RIWAYAT
 ===================================================== */
 
 function renderTransactions() {
-
-    if (
-        !transactionList
-    ) return;
-
 
     if (
         transactions.length === 0
@@ -945,17 +972,11 @@ function renderTransactions() {
 
     transactionList.innerHTML =
         transactions.map(
-            transaction => {
+            function(transaction) {
 
                 const isIncome =
                     transaction.type ===
                     "income";
-
-
-                const amountText =
-                    formatRupiah(
-                        transaction.amount
-                    );
 
 
                 const sign =
@@ -970,35 +991,45 @@ function renderTransactions() {
                         : "Uang Keluar";
 
 
-                let extraInfo = "";
+                let extra =
+                    "";
 
 
                 if (!isIncome) {
 
-                    extraInfo =
-                        `<small>
+                    extra = `
+
+                        <small>
+                            Kategori:
                             ${escapeHTML(
-                                transaction.category || ""
+                                transaction.category
                             )}
-                            ${
-                                transaction.reason
-                                    ? " — " +
-                                      escapeHTML(
-                                          transaction.reason
-                                      )
-                                    : ""
-                            }
-                        </small>`;
+                        </small>
+
+                        ${
+                            transaction.reason
+                                ? `
+                                    <small>
+                                        Alasan:
+                                        ${escapeHTML(
+                                            transaction.reason
+                                        )}
+                                    </small>
+                                  `
+                                : ""
+                        }
+
+                    `;
 
                 }
 
 
                 return `
 
-                    <div
-                        class="transaction-item
-                        ${isIncome ? "income" : "expense"}"
-                    >
+                    <div class="transaction-item
+                        ${isIncome
+                            ? "income"
+                            : "expense"}">
 
                         <div class="transaction-info">
 
@@ -1018,7 +1049,7 @@ function renderTransactions() {
                                 ${typeText}
                             </small>
 
-                            ${extraInfo}
+                            ${extra}
 
                         </div>
 
@@ -1026,30 +1057,13 @@ function renderTransactions() {
                         <div class="transaction-right">
 
                             <strong>
-                                ${sign}${amountText}
+                                ${sign}${formatRupiah(
+                                    transaction.amount
+                                )}
                             </strong>
 
                             <button
                                 type="button"
                                 class="delete-btn"
                                 data-id="${transaction.id}"
-                            >
-                                Hapus
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                `;
-
-            }
-        ).join("");
-
-
-    /* -----------------------------
-       TOMBOL HAPUS
-    ----------------------------- */
-
-    const deleteButtons =
-        transactionList.querySelectorAll(
+       
