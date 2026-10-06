@@ -1,16 +1,27 @@
-/* =========================================
-   E-MONEY
-   Personal Finance Dashboard
-========================================= */
+/* =====================================================
+   E-MONEY JAVASCRIPT
+===================================================== */
 
-const form = document.getElementById("transactionForm");
 
-const amountInput = document.getElementById("amount");
-const dateInput = document.getElementById("date");
-const descriptionInput = document.getElementById("description");
+/* ELEMENT */
 
-const categoryInput = document.getElementById("category");
-const reasonInput = document.getElementById("reason");
+const form =
+    document.getElementById("transactionForm");
+
+const amountInput =
+    document.getElementById("amount");
+
+const dateInput =
+    document.getElementById("date");
+
+const descriptionInput =
+    document.getElementById("description");
+
+const categoryInput =
+    document.getElementById("category");
+
+const reasonInput =
+    document.getElementById("reason");
 
 const transactionTypeInput =
     document.getElementById("transactionType");
@@ -42,11 +53,11 @@ const expenseRatioElement =
 const financialStatus =
     document.getElementById("financialStatus");
 
-const statusDescription =
-    document.getElementById("statusDescription");
-
 const statusIcon =
     document.getElementById("statusIcon");
+
+const statusDescription =
+    document.getElementById("statusDescription");
 
 const progressBar =
     document.getElementById("progressBar");
@@ -61,29 +72,39 @@ const themeToggle =
     document.getElementById("themeToggle");
 
 
-/* =========================================
-   DATA
-========================================= */
+/* DATABASE */
 
-let transactions =
-    JSON.parse(
-        localStorage.getItem("emoney_transactions")
-    ) || [];
+let transactions = [];
+
+try {
+
+    transactions =
+        JSON.parse(
+            localStorage.getItem(
+                "emoney_transactions"
+            )
+        ) || [];
+
+} catch (error) {
+
+    console.error(error);
+
+    transactions = [];
+
+}
 
 
-/* =========================================
-   DATE DEFAULT
-========================================= */
+/* DEFAULT DATE */
 
 dateInput.value =
-    new Date().toISOString().split("T")[0];
+    new Date()
+        .toISOString()
+        .split("T")[0];
 
 
-/* =========================================
-   FORMAT RUPIAH
-========================================= */
+/* FORMAT RUPIAH */
 
-function formatRupiah(number) {
+function formatRupiah(value) {
 
     return new Intl.NumberFormat(
         "id-ID",
@@ -92,64 +113,108 @@ function formatRupiah(number) {
             currency: "IDR",
             maximumFractionDigits: 0
         }
-    ).format(number);
+    ).format(value);
 
 }
 
 
-/* =========================================
-   FORMAT DATE
-========================================= */
+/* FORMAT TANGGAL */
 
 function formatDate(date) {
 
-    return new Date(date).toLocaleDateString(
-        "id-ID",
-        {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-        }
+    if (!date) return "-";
+
+    return new Date(date)
+        .toLocaleDateString(
+            "id-ID",
+            {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            }
+        );
+
+}
+
+
+/* SAVE DATA */
+
+function saveData() {
+
+    localStorage.setItem(
+        "emoney_transactions",
+        JSON.stringify(
+            transactions
+        )
     );
 
 }
 
 
-/* =========================================
-   TRANSACTION TYPE
-========================================= */
+/* =====================================================
+   PILIH UANG MASUK / KELUAR
+===================================================== */
 
-document.querySelectorAll(".type-btn")
+document
+    .querySelectorAll(".type-btn")
     .forEach(button => {
 
         button.addEventListener(
             "click",
-            () => {
+            function () {
 
                 document
-                    .querySelectorAll(".type-btn")
-                    .forEach(btn =>
-                        btn.classList.remove("active")
-                    );
+                    .querySelectorAll(
+                        ".type-btn"
+                    )
+                    .forEach(btn => {
 
-                button.classList.add("active");
+                        btn.classList.remove(
+                            "active"
+                        );
+
+                    });
+
+
+                this.classList.add(
+                    "active"
+                );
+
 
                 const type =
-                    button.dataset.type;
+                    this.dataset.type;
 
-                transactionTypeInput.value = type;
 
-                if (type === "expense") {
+                transactionTypeInput.value =
+                    type;
+
+
+                if (
+                    type === "expense"
+                ) {
 
                     expenseFields
                         .classList
-                        .remove("hidden");
+                        .remove(
+                            "hidden"
+                        );
 
                 } else {
 
                     expenseFields
                         .classList
-                        .add("hidden");
+                        .add(
+                            "hidden"
+                        );
+
+                    reasonGroup
+                        .classList
+                        .add(
+                            "hidden"
+                        );
+
+                    reasonInput.required =
+                        false;
 
                 }
 
@@ -159,29 +224,38 @@ document.querySelectorAll(".type-btn")
     });
 
 
-/* =========================================
-   CATEGORY
-========================================= */
+/* =====================================================
+   KATEGORI
+===================================================== */
 
 categoryInput.addEventListener(
     "change",
-    () => {
+    function () {
 
-        if (categoryInput.value === "Lainnya") {
+        if (
+            this.value ===
+            "Lainnya"
+        ) {
 
             reasonGroup
                 .classList
-                .remove("hidden");
+                .remove(
+                    "hidden"
+                );
 
-            reasonInput.required = true;
+            reasonInput.required =
+                true;
 
         } else {
 
             reasonGroup
                 .classList
-                .add("hidden");
+                .add(
+                    "hidden"
+                );
 
-            reasonInput.required = false;
+            reasonInput.required =
+                false;
 
             reasonInput.value = "";
 
@@ -191,51 +265,117 @@ categoryInput.addEventListener(
 );
 
 
-/* =========================================
-   SUBMIT
-========================================= */
+/* =====================================================
+   SIMPAN TRANSAKSI
+===================================================== */
 
 form.addEventListener(
     "submit",
-    event => {
+    function (event) {
 
         event.preventDefault();
-
-        const amount =
-            Number(amountInput.value);
-
-        if (!amount || amount <= 0) {
-
-            alert("Masukkan nominal yang valid.");
-
-            return;
-
-        }
 
 
         const type =
             transactionTypeInput.value;
 
 
+        const amount =
+            Number(
+                amountInput.value
+            );
+
+
+        const date =
+            dateInput.value;
+
+
+        const description =
+            descriptionInput
+                .value
+                .trim();
+
+
+        /* VALIDASI NOMINAL */
+
+        if (
+            !Number.isFinite(amount) ||
+            amount <= 0
+        ) {
+
+            alert(
+                "Masukkan nominal uang yang benar."
+            );
+
+            amountInput.focus();
+
+            return;
+
+        }
+
+
+        /* VALIDASI TANGGAL */
+
+        if (!date) {
+
+            alert(
+                "Pilih tanggal transaksi."
+            );
+
+            dateInput.focus();
+
+            return;
+
+        }
+
+
+        /* VALIDASI KETERANGAN */
+
+        if (!description) {
+
+            alert(
+                "Masukkan keterangan transaksi."
+            );
+
+            descriptionInput.focus();
+
+            return;
+
+        }
+
+
         let category = "";
         let reason = "";
 
 
-        if (type === "expense") {
+        /* KHUSUS PENGELUARAN */
+
+        if (
+            type === "expense"
+        ) {
 
             category =
                 categoryInput.value;
 
-            if (category === "Lainnya") {
+
+            if (
+                category ===
+                "Lainnya"
+            ) {
 
                 reason =
-                    reasonInput.value.trim();
+                    reasonInput
+                        .value
+                        .trim();
+
 
                 if (!reason) {
 
                     alert(
                         "Masukkan alasan pembelian."
                     );
+
+                    reasonInput.focus();
 
                     return;
 
@@ -246,117 +386,151 @@ form.addEventListener(
         }
 
 
-        const transaction = {
+        /* BUAT TRANSAKSI */
 
-            id:
-                Date.now(),
+        const newTransaction = {
 
-            type:
+            id: Date.now(),
 
-                type,
+            type: type,
 
-            amount:
+            amount: amount,
 
-                amount,
+            date: date,
 
-            date:
+            category: category,
 
-                dateInput.value,
+            reason: reason,
 
-            category:
-
-                category,
-
-            reason:
-
-                reason,
-
-            description:
-
-                descriptionInput
-                    .value
-                    .trim()
+            description: description
 
         };
 
 
-        transactions.unshift(transaction);
+        /* TAMBAHKAN */
+
+        transactions.unshift(
+            newTransaction
+        );
+
+
+        /* SIMPAN */
 
         saveData();
 
-        form.reset();
 
-        dateInput.value =
-            new Date()
-                .toISOString()
-                .split("T")[0];
+        /* RESET */
+
+        resetForm();
 
 
-        transactionTypeInput.value =
-            "income";
-
-        document
-            .querySelectorAll(".type-btn")
-            .forEach(btn =>
-                btn.classList.remove("active")
-            );
-
-        document
-            .querySelector(
-                '[data-type="income"]'
-            )
-            .classList.add("active");
-
-        expenseFields
-            .classList
-            .add("hidden");
-
-        reasonGroup
-            .classList
-            .add("hidden");
+        /* UPDATE */
 
         render();
+
+
+        /* NOTIFIKASI */
+
+        alert(
+            type === "income"
+                ? "Uang masuk berhasil disimpan!"
+                : "Pengeluaran berhasil disimpan!"
+        );
 
     }
 );
 
 
-/* =========================================
-   SAVE
-========================================= */
+/* =====================================================
+   RESET FORM
+===================================================== */
 
-function saveData() {
+function resetForm() {
 
-    localStorage.setItem(
-        "emoney_transactions",
-        JSON.stringify(transactions)
-    );
+    form.reset();
+
+
+    dateInput.value =
+        new Date()
+            .toISOString()
+            .split("T")[0];
+
+
+    transactionTypeInput.value =
+        "income";
+
+
+    document
+        .querySelectorAll(
+            ".type-btn"
+        )
+        .forEach(btn =>
+            btn.classList.remove(
+                "active"
+            )
+        );
+
+
+    document
+        .querySelector(
+            '[data-type="income"]'
+        )
+        .classList.add(
+            "active"
+        );
+
+
+    expenseFields
+        .classList
+        .add("hidden");
+
+
+    reasonGroup
+        .classList
+        .add("hidden");
+
+
+    reasonInput.required =
+        false;
 
 }
 
 
-/* =========================================
-   CALCULATE
-========================================= */
+/* =====================================================
+   HITUNG KEUANGAN
+===================================================== */
 
 function calculate() {
 
     let income = 0;
+
     let expense = 0;
 
-    transactions.forEach(transaction => {
 
-        if (transaction.type === "income") {
+    transactions.forEach(
+        transaction => {
 
-            income += transaction.amount;
+            const amount =
+                Number(
+                    transaction.amount
+                ) || 0;
 
-        } else {
 
-            expense += transaction.amount;
+            if (
+                transaction.type ===
+                "income"
+            ) {
+
+                income += amount;
+
+            } else {
+
+                expense += amount;
+
+            }
 
         }
-
-    });
+    );
 
 
     const balance =
@@ -365,7 +539,10 @@ function calculate() {
 
     const ratio =
         income > 0
-            ? (expense / income) * 100
+            ? (
+                expense /
+                income
+            ) * 100
             : 0;
 
 
@@ -379,30 +556,31 @@ function calculate() {
 }
 
 
-/* =========================================
-   FINANCIAL STATUS
-========================================= */
+/* =====================================================
+   STATUS KEUANGAN
+===================================================== */
 
-function updateFinancialStatus() {
+function updateStatus() {
 
     const {
         income,
-        expense,
         ratio
     } = calculate();
 
 
-    if (income === 0) {
+    if (income <= 0) {
 
         financialStatus.textContent =
             "Belum Ada Data";
 
-        statusIcon.textContent = "—";
+        statusIcon.textContent =
+            "—";
 
         statusDescription.textContent =
-            "Tambahkan pemasukan dan pengeluaran untuk mendapatkan analisis.";
+            "Tambahkan pemasukan terlebih dahulu.";
 
-        progressBar.style.width = "0%";
+        progressBar.style.width =
+            "0%";
 
         progressBar.style.background =
             "#94a3b8";
@@ -413,34 +591,19 @@ function updateFinancialStatus() {
 
 
     let status;
-    let description;
     let icon;
-
-
-    /*
-       LOGIKA:
-
-       0 - 30%
-       = Cerdas
-
-       >30 - 50%
-       = Hemat
-
-       >50 - 75%
-       = Normal
-
-       >75%
-       = Boros
-    */
+    let description;
+    let color;
 
 
     if (ratio <= 30) {
 
         status = "Cerdas";
         icon = "★";
+        color = "#16a34a";
 
         description =
-            "Pengeluaran sangat terkendali. Kamu mampu menjaga sebagian besar pemasukan.";
+            "Pengeluaran sangat terkendali. Kamu mampu menyimpan sebagian besar pemasukan.";
 
     }
 
@@ -448,9 +611,10 @@ function updateFinancialStatus() {
 
         status = "Hemat";
         icon = "✓";
+        color = "#2563eb";
 
         description =
-            "Keuangan cukup sehat. Pengeluaran masih berada pada tingkat yang hemat.";
+            "Pengeluaran cukup hemat dan masih berada pada kondisi keuangan yang baik.";
 
     }
 
@@ -458,9 +622,10 @@ function updateFinancialStatus() {
 
         status = "Normal";
         icon = "●";
+        color = "#f59e0b";
 
         description =
-            "Pengeluaran masih dalam batas normal, tetapi tetap perhatikan kebutuhan non-prioritas.";
+            "Pengeluaran masih normal. Tetap perhatikan pembelian yang tidak terlalu penting.";
 
     }
 
@@ -468,9 +633,10 @@ function updateFinancialStatus() {
 
         status = "Boros";
         icon = "!";
+        color = "#dc2626";
 
         description =
-            "Pengeluaran cukup tinggi dibanding pemasukan. Pertimbangkan mengurangi pembelian yang tidak terlalu penting.";
+            "Pengeluaran cukup tinggi dibanding pemasukan. Kurangi pengeluaran non-prioritas.";
 
     }
 
@@ -484,132 +650,109 @@ function updateFinancialStatus() {
     statusDescription.textContent =
         description;
 
-
     progressBar.style.width =
-        Math.min(ratio, 100) + "%";
+        Math.min(
+            ratio,
+            100
+        ) + "%";
 
-
-    if (status === "Cerdas") {
-
-        progressBar.style.background =
-            "#16a34a";
-
-        statusIcon.style.background =
-            "#dcfce7";
-
-    }
-
-    else if (status === "Hemat") {
-
-        progressBar.style.background =
-            "#2563eb";
-
-        statusIcon.style.background =
-            "#dbeafe";
-
-    }
-
-    else if (status === "Normal") {
-
-        progressBar.style.background =
-            "#f59e0b";
-
-        statusIcon.style.background =
-            "#fef3c7";
-
-    }
-
-    else {
-
-        progressBar.style.background =
-            "#dc2626";
-
-        statusIcon.style.background =
-            "#fee2e2";
-
-    }
+    progressBar.style.background =
+        color;
 
 }
 
 
-/* =========================================
-   ANALYSIS
-========================================= */
+/* =====================================================
+   ANALISIS
+===================================================== */
 
 function updateAnalysis() {
 
     const {
-        income,
-        expense,
         balance,
         ratio
     } = calculate();
 
 
-    if (transactions.length === 0) {
+    if (
+        transactions.length === 0
+    ) {
 
         analysisContent.innerHTML =
-            "<p>Belum ada data yang dapat dianalisis.</p>";
+            `
+                <p class="muted">
+                    Belum ada data.
+                </p>
+            `;
 
         return;
 
     }
 
 
-    const expenseTransactions =
-        transactions.filter(
-            transaction =>
-                transaction.type === "expense"
-        );
+    let needs = 0;
+    let others = 0;
 
 
-    const needs =
-        expenseTransactions
-            .filter(
-                transaction =>
-                    transaction.category === "Kebutuhan"
-            )
-            .reduce(
-                (sum, transaction) =>
-                    sum + transaction.amount,
-                0
-            );
+    transactions.forEach(
+        transaction => {
+
+            if (
+                transaction.type !==
+                "expense"
+            ) return;
 
 
-    const others =
-        expenseTransactions
-            .filter(
-                transaction =>
-                    transaction.category === "Lainnya"
-            )
-            .reduce(
-                (sum, transaction) =>
-                    sum + transaction.amount,
-                0
-            );
+            const amount =
+                Number(
+                    transaction.amount
+                ) || 0;
 
 
-    let advice = "";
+            if (
+                transaction.category ===
+                "Kebutuhan"
+            ) {
+
+                needs += amount;
+
+            }
+
+
+            if (
+                transaction.category ===
+                "Lainnya"
+            ) {
+
+                others += amount;
+
+            }
+
+        }
+    );
+
+
+    let advice;
 
 
     if (ratio > 75) {
 
         advice =
-            "Pengeluaran sudah tinggi. Prioritaskan kebutuhan utama dan kurangi pembelian yang bisa ditunda.";
+            "Pengeluaran tinggi. Kurangi pembelian non-prioritas.";
 
     }
 
     else if (ratio > 50) {
 
         advice =
-            "Pengeluaran masih normal. Tetap sisihkan sebagian pemasukan untuk tabungan.";
+            "Pengeluaran normal. Tetap sisihkan uang untuk tabungan.";
 
     }
 
     else {
 
         advice =
-            "Pengelolaan keuangan cukup baik. Pertahankan kebiasaan mengontrol pengeluaran.";
+            "Keuangan cukup baik. Pertahankan kebiasaan hemat.";
 
     }
 
@@ -618,34 +761,44 @@ function updateAnalysis() {
 
         <div class="analysis-item">
             <strong>Rasio:</strong>
+
             <span>
-                ${ratio.toFixed(1)}% pemasukan digunakan.
+                ${ratio.toFixed(1)}%
+                dari pemasukan digunakan.
             </span>
         </div>
 
+
         <div class="analysis-item">
             <strong>Kebutuhan:</strong>
+
             <span>
                 ${formatRupiah(needs)}
             </span>
         </div>
 
+
         <div class="analysis-item">
             <strong>Lainnya:</strong>
+
             <span>
                 ${formatRupiah(others)}
             </span>
         </div>
 
+
         <div class="analysis-item">
             <strong>Sisa:</strong>
+
             <span>
                 ${formatRupiah(balance)}
             </span>
         </div>
 
+
         <div class="analysis-item">
             <strong>Saran:</strong>
+
             <span>
                 ${advice}
             </span>
@@ -656,9 +809,9 @@ function updateAnalysis() {
 }
 
 
-/* =========================================
+/* =====================================================
    DASHBOARD
-========================================= */
+===================================================== */
 
 function updateDashboard() {
 
@@ -671,35 +824,47 @@ function updateDashboard() {
 
 
     saldoElement.textContent =
-        formatRupiah(balance);
+        formatRupiah(
+            balance
+        );
+
 
     totalIncomeElement.textContent =
-        formatRupiah(income);
+        formatRupiah(
+            income
+        );
+
 
     totalExpenseElement.textContent =
-        formatRupiah(expense);
+        formatRupiah(
+            expense
+        );
+
 
     transactionCountElement.textContent =
         transactions.length;
+
 
     expenseRatioElement.textContent =
         ratio.toFixed(1) + "%";
 
 
-    updateFinancialStatus();
+    updateStatus();
 
     updateAnalysis();
 
 }
 
 
-/* =========================================
-   RENDER TRANSACTIONS
-========================================= */
+/* =====================================================
+   RIWAYAT
+===================================================== */
 
 function renderTransactions() {
 
-    if (transactions.length === 0) {
+    if (
+        transactions.length === 0
+    ) {
 
         transactionList.innerHTML = `
 
@@ -707,10 +872,12 @@ function renderTransactions() {
 
                 <div>📊</div>
 
-                <h3>Belum ada transaksi</h3>
+                <h3>
+                    Belum ada transaksi
+                </h3>
 
                 <p>
-                    Tambahkan transaksi pertamamu.
+                    Tambahkan transaksi pertama.
                 </p>
 
             </div>
@@ -724,20 +891,26 @@ function renderTransactions() {
 
     transactionList.innerHTML =
         transactions
-            .map(transaction => {
+        .map(
+            transaction => {
 
                 const isIncome =
-                    transaction.type === "income";
+                    transaction.type ===
+                    "income";
 
 
                 let meta =
-                    formatDate(transaction.date);
+                    formatDate(
+                        transaction.date
+                    );
 
 
                 if (!isIncome) {
 
                     meta +=
-                        ` • ${transaction.category}`;
+                        " • " +
+                        transaction.category;
+
 
                     if (
                         transaction.category ===
@@ -745,7 +918,8 @@ function renderTransactions() {
                     ) {
 
                         meta +=
-                            ` • ${transaction.reason}`;
+                            " • " +
+                            transaction.reason;
 
                     }
 
@@ -754,49 +928,88 @@ function renderTransactions() {
 
                 return `
 
-                    <div class="transaction-item">
+                    <div
+                        class="transaction-item"
+                    >
 
-                        <div class="transaction-left">
+                        <div
+                            class="transaction-left"
+                        >
 
-                            <div class="transaction-icon">
-                                ${isIncome ? "↓" : "↑"}
+                            <div
+                                class="transaction-icon"
+                            >
+                                ${
+                                    isIncome
+                                        ? "↓"
+                                        : "↑"
+                                }
                             </div>
+
 
                             <div>
 
-                                <div class="transaction-description">
-                                    ${escapeHTML(
-                                        transaction.description
-                                    )}
+                                <div
+                                    class="transaction-description"
+                                >
+                                    ${
+                                        escapeHTML(
+                                            transaction.description
+                                        )
+                                    }
                                 </div>
 
-                                <div class="transaction-meta">
-                                    ${meta}
+
+                                <div
+                                    class="transaction-meta"
+                                >
+                                    ${
+                                        escapeHTML(
+                                            meta
+                                        )
+                                    }
                                 </div>
 
                             </div>
 
                         </div>
 
+
                         <div>
 
-                            <div class="
-                                transaction-amount
-                                ${isIncome
-                                    ? "income"
-                                    : "expense"}
-                            ">
+                            <div
+                                class="
+                                    transaction-amount
+                                    ${
+                                        isIncome
+                                            ? "income"
+                                            : "expense"
+                                    }
+                                "
+                            >
 
-                                ${isIncome ? "+" : "-"}
-                                ${formatRupiah(
-                                    transaction.amount
-                                )}
+                                ${
+                                    isIncome
+                                        ? "+"
+                                        : "-"
+                                }
+
+                                ${
+                                    formatRupiah(
+                                        transaction.amount
+                                    )
+                                }
 
                             </div>
 
+
                             <button
                                 class="delete-btn"
-                                onclick="deleteTransaction(${transaction.id})"
+                                onclick="
+                                    deleteTransaction(
+                                        ${transaction.id}
+                                    )
+                                "
                             >
                                 Hapus
                             </button>
@@ -807,24 +1020,24 @@ function renderTransactions() {
 
                 `;
 
-            })
-            .join("");
+            }
+        )
+        .join("");
 
 }
 
 
-/* =========================================
-   DELETE
-========================================= */
+/* =====================================================
+   HAPUS SATU TRANSAKSI
+===================================================== */
 
 function deleteTransaction(id) {
 
-    const confirmed =
-        confirm(
+    if (
+        !confirm(
             "Hapus transaksi ini?"
-        );
-
-    if (!confirmed) return;
+        )
+    ) return;
 
 
     transactions =
@@ -841,15 +1054,17 @@ function deleteTransaction(id) {
 }
 
 
-/* =========================================
-   CLEAR ALL
-========================================= */
+/* =====================================================
+   HAPUS SEMUA
+===================================================== */
 
 clearTransactions.addEventListener(
     "click",
-    () => {
+    function () {
 
-        if (transactions.length === 0) {
+        if (
+            transactions.length === 0
+        ) {
 
             alert(
                 "Belum ada transaksi."
@@ -860,13 +1075,11 @@ clearTransactions.addEventListener(
         }
 
 
-        const confirmed =
-            confirm(
-                "Hapus SEMUA transaksi?"
-            );
-
-
-        if (!confirmed) return;
+        if (
+            !confirm(
+                "Hapus semua transaksi?"
+            )
+        ) return;
 
 
         transactions = [];
@@ -879,14 +1092,16 @@ clearTransactions.addEventListener(
 );
 
 
-/* =========================================
-   ESCAPE HTML
-========================================= */
+/* =====================================================
+   SECURITY
+===================================================== */
 
 function escapeHTML(value) {
 
     const div =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     div.textContent =
         value || "";
@@ -896,68 +1111,9 @@ function escapeHTML(value) {
 }
 
 
-/* =========================================
-   RENDER EVERYTHING
-========================================= */
-
-function render() {
-
-    updateDashboard();
-
-    renderTransactions();
-
-}
-
-
-/* =========================================
+/* =====================================================
    DARK MODE
-========================================= */
+===================================================== */
 
-const savedTheme =
-    localStorage.getItem(
-        "emoney_theme"
-    );
-
-
-if (savedTheme === "dark") {
-
-    document.body.classList.add("dark");
-
-    themeToggle.textContent = "☀";
-
-}
-
-
-themeToggle.addEventListener(
-    "click",
-    () => {
-
-        document.body.classList.toggle(
-            "dark"
-        );
-
-
-        const isDark =
-            document.body.classList.contains(
-                "dark"
-            );
-
-
-        localStorage.setItem(
-            "emoney_theme",
-            isDark ? "dark" : "light"
-        );
-
-
-        themeToggle.textContent =
-            isDark ? "☀" : "☾";
-
-    }
-);
-
-
-/* =========================================
-   START APP
-========================================= */
-
-render();
+if (
+    localS
